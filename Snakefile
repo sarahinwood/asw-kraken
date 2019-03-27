@@ -74,20 +74,20 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
 	input:
-		'output/bac_reads/baculoviral_reads_r1.fq.gz'
+		expand('output/bac_reads/{sample}_baculoviral_reads_r1.fq.gz', sample=all_samples)
 
 rule filter_baculovirus_reads:
 	input:
 		bac_read_names = 'output/bac_reads/kraken_bac_read_names.txt',
-		r1 = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
-		r2 = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+		r1 = 'output/bbduk_trim/{sample}_r1.fq.gz',
+		r2 = 'output/bbduk_trim/{sample}_r2.fq.gz'
 	output:
-		bac_reads_r1 = 'output/bac_reads/baculoviral_reads_r1.fq.gz',
-		bac_reads_r2 = 'output/bac_reads/baculoviral_reads_r2.fq.gz'
+		bac_reads_r1 = 'output/bac_reads/{sample}_baculoviral_reads_r1.fq.gz',
+		bac_reads_r2 = 'output/bac_reads/{sample}_baculoviral_reads_r2.fq.gz'
 	threads:
 		20
 	log:
-		'output/logs/filter_baculovirus_reads.log'
+		'output/logs/bac_filtering/filter_baculovirus_reads_{sample}.log'
 	singularity:
 		bbduk_container
 	shell:
@@ -102,7 +102,7 @@ rule filter_baculovirus_reads:
 
 rule read_names:
 	input:
-		kraken_bac_res = 'output/kraken_all/kraken_bac_res.txt'
+		kraken_bac_res = 'output/bac_reads/kraken_bac_res.txt'
 	output:
 		bac_read_names = 'output/bac_reads/kraken_bac_read_names.txt'
 	singularity:
